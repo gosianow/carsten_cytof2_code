@@ -10,7 +10,7 @@ plot_frequencies <- function(ggdf, color_groups, color_groupsb, outdir, prefix, 
     # plot all clusters in one pdf; colors per response; boxplots + points
     
     
-    ggp <- ggplot(ggdf, aes(x = cluster, y = prop, color = group, shape = data, fill = group)) +
+    ggp <- ggplot(ggdf, aes(x = cluster, y = prop, color = group, fill = group)) +
       geom_boxplot(width = 0.95, position = position_dodge(width = 0.95), outlier.colour = NA) +
       geom_point(size=1.5, alpha = 0.8, position = position_jitterdodge(jitter.width = 0.95, jitter.height = 0, dodge.width = 0.95)) +
       theme_bw() +
@@ -27,7 +27,7 @@ plot_frequencies <- function(ggdf, color_groups, color_groupsb, outdir, prefix, 
       guides(color = guide_legend(ncol = 1)) +
       scale_color_manual(values = color_groups) +
       scale_fill_manual(values = color_groupsb) +
-      facet_wrap(~ day)
+      facet_wrap(~ condition2)
     
     pdf(file.path(outdir, paste0(prefix, "frequencies_plot.pdf")), w = nlevels(ggdf$cluster) + 3, h = pdf_hight)
     print(ggp)
@@ -44,7 +44,7 @@ plot_frequencies <- function(ggdf, color_groups, color_groupsb, outdir, prefix, 
       
       df <- ggdf[ggdf$cluster == clusters[i], , drop = FALSE]
       
-      ggp[[i]] <- ggplot(df, aes(x = group, y = prop, color = group, shape = data, fill = group)) +
+      ggp[[i]] <- ggplot(df, aes(x = group, y = prop, color = group, fill = group)) +
         geom_boxplot(width = 0.95, position = position_dodge(width = 0.95), outlier.colour = NA) +
         geom_point(size=3, alpha = 0.8, position = position_jitterdodge(jitter.width = 0.95, jitter.height = 0, dodge.width = 0.95)) +
         ggtitle(clusters[i]) +
@@ -75,16 +75,16 @@ plot_frequencies <- function(ggdf, color_groups, color_groupsb, outdir, prefix, 
     # plot all clusters in one pdf; colors per response; separate pdf for base and tx; one boxplot + points
     
     
-    days <- levels(ggdf$day)
+    condition2s <- levels(ggdf$condition2)
     
-    for(i in 1:nlevels(ggdf$day)){
+    for(i in 1:nlevels(ggdf$condition2)){
       # i = 1
       
-      df <- ggdf[ggdf$day == days[i], , drop = FALSE]
+      df <- ggdf[ggdf$condition2 == condition2s[i], , drop = FALSE]
       
       ggp <- ggplot(df) +
         geom_boxplot(aes(x = cluster, y = prop, color = group, fill = group), width = 0.95, position = position_dodge(width = 0.95), outlier.colour = NA) +
-        geom_point(aes(x = cluster, y = prop, color = group, shape = data), size=2, alpha = 0.8, position = position_jitterdodge(jitter.width = 0.95, jitter.height = 0, dodge.width = 0.95)) +
+        geom_point(aes(x = cluster, y = prop, color = group), size=2, alpha = 0.8, position = position_jitterdodge(jitter.width = 0.95, jitter.height = 0, dodge.width = 0.95)) +
         theme_bw() +
         ylab("Frequency") +
         xlab("") +
@@ -99,7 +99,7 @@ plot_frequencies <- function(ggdf, color_groups, color_groupsb, outdir, prefix, 
         scale_color_manual(values = color_groups) +
         scale_fill_manual(values = color_groupsb)
       
-      pdf(file.path(outdir, paste0(prefix, "frequencies_plot_boxplotpoints_", days[i] ,".pdf")), w = nlevels(ggdf$cluster)/2 + 3, h = pdf_hight)
+      pdf(file.path(outdir, paste0(prefix, "frequencies_plot_boxplotpoints_", condition2s[i] ,".pdf")), w = nlevels(ggdf$cluster)/2 + 3, h = pdf_hight)
       print(ggp)
       dev.off()
       
@@ -109,21 +109,21 @@ plot_frequencies <- function(ggdf, color_groups, color_groupsb, outdir, prefix, 
     # ------------------------------------
     # plot all clusters in one pdf; colors per response; separate pdf for base and tx; one boxplot + points + facet per cluster
     
-    days <- levels(ggdf$day)
+    condition2s <- levels(ggdf$condition2)
     
     nr_cluster <- nlevels(ggdf$cluster)
     nrow <- ifelse(nr_cluster < 6, 1, 2)
     h <- ifelse(nr_cluster < 6, 2, 4)
     w <- ifelse(nr_cluster < 6, nr_cluster * 1.25 + 2, ceiling(nr_cluster/2) * 1.5 + 2)
     
-    for(i in 1:nlevels(ggdf$day)){
+    for(i in 1:nlevels(ggdf$condition2)){
       # i = 1
       
-      df <- ggdf[ggdf$day == days[i], , drop = FALSE]
+      df <- ggdf[ggdf$condition2 == condition2s[i], , drop = FALSE]
       
       ggp <- ggplot(df) +
         geom_boxplot(aes(x = cluster, y = prop, color = group, fill = group), width = 0.95, position = position_dodge(width = 0.95), outlier.colour = NA) +
-        geom_point(aes(x = cluster, y = prop, color = group, shape = data), size=2, alpha = 0.8, position = position_jitterdodge(jitter.width = 0.95, jitter.height = 0, dodge.width = 0.95)) +
+        geom_point(aes(x = cluster, y = prop, color = group), size=2, alpha = 0.8, position = position_jitterdodge(jitter.width = 0.95, jitter.height = 0, dodge.width = 0.95)) +
         theme_bw() +
         ylab("Frequency") +
         xlab("") +
@@ -141,7 +141,7 @@ plot_frequencies <- function(ggdf, color_groups, color_groupsb, outdir, prefix, 
         scale_fill_manual(values = color_groupsb) +
         facet_wrap(~ cluster, scales = "free", nrow = nrow)
       
-      pdf(file.path(outdir, paste0(prefix, "frequencies_plot_boxplotpoints_", days[i] ,"2.pdf")), w = w, h = h)
+      pdf(file.path(outdir, paste0(prefix, "frequencies_plot_boxplotpoints_", condition2s[i] ,"2.pdf")), w = w, h = h)
       print(ggp)
       dev.off()
       
@@ -150,22 +150,22 @@ plot_frequencies <- function(ggdf, color_groups, color_groupsb, outdir, prefix, 
     # ------------------------------------
     # plot all clusters in one pdf; colors per response; separate pdf for base and tx; one boxplot + points + pdf page per cluster
     
-    days <- levels(ggdf$day)
+    condition2s <- levels(ggdf$condition2)
     clusters <- levels(ggdf$cluster)
     
     
-    for(i in 1:nlevels(ggdf$day)){
+    for(i in 1:nlevels(ggdf$condition2)){
       # i = 1
       
       ggp <- list()
       
       for(j in 1:nlevels(ggdf$cluster)){
         
-        df <- ggdf[ggdf$day == days[i] & ggdf$cluster == clusters[j], , drop = FALSE]
+        df <- ggdf[ggdf$condition2 == condition2s[i] & ggdf$cluster == clusters[j], , drop = FALSE]
         
         ggp[[j]] <- ggplot(df) +
           geom_boxplot(aes(x = cluster, y = prop, color = group, fill = group), width = 0.95, position = position_dodge(width = 0.95), outlier.colour = NA) +
-          geom_point(aes(x = cluster, y = prop, color = group, shape = data), size=2, alpha = 0.8, position = position_jitterdodge(jitter.width = 0.95, jitter.height = 0, dodge.width = 0.95)) +
+          geom_point(aes(x = cluster, y = prop, color = group), size=2, alpha = 0.8, position = position_jitterdodge(jitter.width = 0.95, jitter.height = 0, dodge.width = 0.95)) +
           theme_bw() +
           ggtitle(clusters[j]) +
           ylab("Frequency") +
@@ -184,7 +184,7 @@ plot_frequencies <- function(ggdf, color_groups, color_groupsb, outdir, prefix, 
       }
       
       
-      pdf(file.path(outdir, paste0(prefix, "frequencies_plot_boxplotpoints_", days[i] ,"3.pdf")), w = 2.5, h = 3)
+      pdf(file.path(outdir, paste0(prefix, "frequencies_plot_boxplotpoints_", condition2s[i] ,"3.pdf")), w = 2.5, h = 3)
       for(j in seq(length(ggp)))
         print(ggp[[j]])
       dev.off()
@@ -202,20 +202,20 @@ plot_frequencies <- function(ggdf, color_groups, color_groupsb, outdir, prefix, 
     plot(1, type="n", axes=F, xlab="", ylab="")
     dev.off()
     
-    for(i in 1:nlevels(ggdf$day)){
-      pdf(file.path(outdir, paste0(prefix, "frequencies_plot_boxplotpoints_", days[i] ,".pdf")))
+    for(i in 1:nlevels(ggdf$condition2)){
+      pdf(file.path(outdir, paste0(prefix, "frequencies_plot_boxplotpoints_", condition2s[i] ,".pdf")))
       plot(1, type="n", axes=F, xlab="", ylab="")
       dev.off()
     }
     
-    for(i in 1:nlevels(ggdf$day)){
-      pdf(file.path(outdir, paste0(prefix, "frequencies_plot_boxplotpoints_", days[i] ,"2.pdf")))
+    for(i in 1:nlevels(ggdf$condition2)){
+      pdf(file.path(outdir, paste0(prefix, "frequencies_plot_boxplotpoints_", condition2s[i] ,"2.pdf")))
       plot(1, type="n", axes=F, xlab="", ylab="")
       dev.off()
     }
     
-    for(i in 1:nlevels(ggdf$day)){
-      pdf(file.path(outdir, paste0(prefix, "frequencies_plot_boxplotpoints_", days[i] ,"3.pdf")))
+    for(i in 1:nlevels(ggdf$condition2)){
+      pdf(file.path(outdir, paste0(prefix, "frequencies_plot_boxplotpoints_", condition2s[i] ,"3.pdf")))
       plot(1, type="n", axes=F, xlab="", ylab="")
       dev.off()
     }

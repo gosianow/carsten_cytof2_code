@@ -35,6 +35,7 @@ path_clustering_labels='030_heatmaps/23_01_pca1_mergingNEW2_clustering_labels.xl
 path_fun_models='/home/gosia/R/carsten_cytof_code/00_models.R'
 path_fun_formulas='/home/gosia/R/carsten_cytof_code/00_formulas_1dataset_3responses.R'
 path_fun_plot_heatmaps <- "/home/gosia/R/carsten_cytof_code/00_plot_heatmaps_for_sign_expr.R"
+path_fun_plot_expression <- "/home/gosia/R/carsten_cytof_code/00_plot_expression.R"
 analysis_type='all'
 
 
@@ -257,6 +258,7 @@ if(analysis_type == "all"){
 # Plot expression per cluster
 # -----------------------------------------------------------------------------
 
+source(path_fun_plot_expression)
 
 ggdf <- melt(a, id.vars = c("cluster", "label", "sample"), value.name = "expr", variable.name = "marker")
 
@@ -270,43 +272,9 @@ ggdf$group <- factor(md$condition[mm])
 ## order markers as for heatmaps
 ggdf$marker <- factor(ggdf$marker, levels = fcs_panel$Antigen[c(scols, xcols)])
 
-clusters <- levels(ggdf$cluster)
 
+plot_expression(ggdf = ggdf, color_groups = color_groups, outdir = outdir, prefix = prefix, prefix2 = out_name)
 
-# ------------------------------------
-## plot each cluster as a separate page in the pdf file
-
-ggp <- list()
-
-for(i in 1:nlevels(ggdf$cluster)){
-  # i = 1
-  
-  df <- ggdf[ggdf$cluster == clusters[i], , drop = FALSE]
-  
-  ggp[[i]] <- ggplot(df, aes(x = group, y = expr, color = group)) +
-    geom_boxplot(outlier.colour = NA) +
-    geom_point(size = 2, shape = 16, alpha = 0.8, position = position_jitterdodge(jitter.width = 1, jitter.height = 0, dodge.width = 1)) +
-    facet_wrap(~ marker, scales = "free") +
-    ggtitle(clusters[i]) +
-    theme_bw() +
-    ylab("Expression") +
-    xlab("") +
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size=12, face="bold"), 
-      axis.title.y = element_text(size=12, face="bold"), 
-      panel.grid.major = element_blank(), 
-      panel.grid.minor = element_blank(), 
-      panel.border = element_blank(), 
-      axis.line.x = element_line(size = 0.5, linetype = "solid", color = "black"), 
-      axis.line.y = element_line(size = 0.5, linetype = "solid", color = "black"),
-      legend.title = element_blank(), legend.position = "right", legend.key = element_blank()) +
-    scale_color_manual(values = color_groups)
-  
-}
-
-pdf(file.path(outdir, paste0(prefix, "expr_", out_name, ".pdf")), w = 18, h = 12, onefile=TRUE)
-for(i in seq(length(ggp)))
-  print(ggp[[i]])
-dev.off()
 
 
 # -----------------------------------------------------------------------------

@@ -1,7 +1,9 @@
 
 
 
-if(identical(levels(md$condition2), c("base", "tx")) && identical(levels(md$condition1), c("NR", "R", "HD"))){
+if(identical(levels(md$condition2), c("PMN", "MNC")) && 
+  identical(levels(md$condition1), c("HD", "Patient"))){
+  
   ## create formulas
   formula_lm <- y ~ condition1 + condition2 + condition1:condition2
   formula_lmer <- y ~ condition1 + condition2 + condition1:condition2 + (1|patient_id)
@@ -10,45 +12,44 @@ if(identical(levels(md$condition2), c("base", "tx")) && identical(levels(md$cond
   formula_glm_beta <- y/total ~ condition1 + condition2 + condition1:condition2
   formula_glmer_binomial <- y/total ~ condition1 + condition2 + condition1:condition2 + (1|patient_id)
   
+  print(model.matrix(y ~ condition1 + condition2 + condition1:condition2, data = data.frame(y = 1, unique(md[, c("condition1", "condition2")]))))
+  
   ## create contrasts
-  contrast_names <- c("NRvsR", "NRvsR_base", "NRvsR_tx", "NRvsR_basevstx")
-  k0 <- c(0, 1, 0, 0, 1/2, 0) # NR vs R
-  k1 <- c(0, 1, 0, 0, 0, 0) # NR vs R in base
-  k2 <- c(0, 1, 0, 0, 1, 0) # NR vs R in tx
-  k3 <- c(0, 0, 0, 0, 1, 0) # whether NR vs R is different in base and tx
-  K <- matrix(c(k0, k1, k2, k3), nrow = 4, byrow = TRUE)
+  contrast_names <- c("HDvsP_PMN", "HDvsP_MNC", "HD_PMNvsP_MNC")
+  k1 <- c(0, 1, 0, 0)
+  k2 <- c(0, 1, 0, 1)
+  k3 <- c(0, 1, 1, 1)
+  K <- matrix(c(k1, k2, k3), nrow = 3, byrow = TRUE)
   rownames(K) <- contrast_names
   
   ### p-value for sorting the output
-  pval_name1 <- "pval_NRvsR"
+  pval_name1 <- "pval_HDvsP_PMN"
   ### p-value for plotting the pheatmap0
-  adjpval_name_list <- c("adjp_NRvsR", "adjp_NRvsR_base", "adjp_NRvsR_tx", "adjp_NRvsR_basevstx")
-  pval_name_list <- c("pval_NRvsR", "pval_NRvsR_base", "pval_NRvsR_tx", "pval_NRvsR_basevstx")
+  adjpval_name_list <- paste0("adjp_", contrast_names)
+  pval_name_list <- paste0("pval_", contrast_names)
   
   ### p-value for plotting the other pheatmaps
   
-  results2plot <- list(both = list(adjpval_name = "adjp_NRvsR", pval_name = "pval_NRvsR", condition1 = c("NR", "R"), condition2 = c("base", "tx")), base = list(adjpval_name = "adjp_NRvsR_base", pval_name = "pval_NRvsR_base", condition1 = c("NR", "R"), condition2 = c("base")), tx = list(adjpval_name = "adjp_NRvsR_tx", pval_name = "pval_NRvsR_tx", condition1 = c("NR", "R"), condition2 = c("tx")))
-  
-  plot_condition1_levels <- c("NR", "R")
+  results2plot <- list(PMN = list(adjpval_name = "adjp_HDvsP_PMN", pval_name = "pval_HDvsP_PMN", condition1 = c("HD", "Patient"), condition2 = c("PMN")), 
+    MNC = list(adjpval_name = "adjp_HDvsP_MNC", pval_name = "pval_HDvsP_MNC", condition1 = c("HD", "Patient"), condition2 = c("MNC")), 
+    PMN_MNC = list(adjpval_name = "adjp_HD_PMNvsP_MNC", pval_name = "pval_HD_PMNvsP_MNC", condition1 = c("HD", "Patient"), condition2 = c("PMN", "MNC")))
   
 }else{
   
-  stop("Metadata does not fit to any the models that are specified !!!")  
+  stop("Metadata does not fit to any of the models that are specified !!!")  
   
 }
 
 
 normalize_expression <- function(expr2norm, md, th){
   
-  md <- md[md$condition1 %in% plot_condition1_levels, , drop = FALSE]
-  
   expr2norm <- expr2norm[, md$shortname]
   
   conditions2 <- levels(md$condition2)
 
-  ### Normalized to mean = 0 and sd = 1 per day
+  ### Normalized to mean = 0 and sd = 1 per condition2
   for(i in conditions2){
-    # i = "base"
+
     expr2norm[, md$condition2 == i] <- t(apply(expr2norm[, md$condition2 == i, drop = FALSE], 1, function(x){ 
       
       if(sum(!is.na(x)) == 0)
@@ -76,6 +77,40 @@ normalize_expression <- function(expr2norm, md, th){
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   
 
 
 

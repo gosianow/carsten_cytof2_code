@@ -6,8 +6,8 @@ source ~/.bash_aliases
 ###############################################################################################################
 ## Define paths to software and reference files
 
-RWD_MAIN=/home/Shared/data/cytof/carsten_cytof
-RCODE=/home/gosia/R/carsten_cytof_code
+RWD_MAIN=/home/Shared/data/cytof/carsten_cytof2
+RCODE=/home/gosia/R/carsten_cytof2_code
 METADATA=$RWD_MAIN/MyeEUNITERfinal_metadata
 PANELS=$RWD_MAIN/MyeEUNITERfinal_panels
 
@@ -28,11 +28,11 @@ cluster_merging=false
 cluster_extracting=false
 
 ## global parameters
-tsne_pmin=2000 # In the CK analysis, I use 1500 per sample.
+tsne_pmin=4000 # In the CK analysis, I use 1500 per sample.
 
 path_fun_prepare_metadata="0myef_prepare_metadata.R"
-path_fun_formulas="00_formulas_1dataset_3responses.R"
-outdir_fun_formulas="3responses"
+path_fun_formulas="00_formulas_myef.R"
+outdir_fun_formulas="/"
 
 ###############################################################################################################
 # Analysis of MyeEUNITERfinal data
@@ -112,8 +112,85 @@ file_panel='panel_MyeEUNITERfinal.xlsx'
 prefix_panel='myef_'
 pca_score_cutoff=0
 
+path_fun_formulas="00_formulas_myef.R"
+outdir_fun_formulas="/"
 
-./Analysis_block_1_main.sh --RCODE ${RCODE} --RWD_MAIN ${RWD_MAIN} --data_dir ${data_dir} --prepare_metadata false --data_normalization ${data_normalization} --pcascores ${pcascores} --select_observables ${select_observables} --flowsom ${flowsom} --flowsom_validation false --heatmaps ${heatmaps} --runtsne ${runtsne} --plottsne ${plottsne} --plottsne_expr false --frequencies ${frequencies} --expression false --METADATA ${METADATA} --path_fun_prepare_metadata ${path_fun_prepare_metadata} --PANELS ${PANELS} --file_metadata ${file_metadata} --file_panel ${file_panel} --prefix_data ${prefix_data} --prefix_panel ${prefix_panel} --prefix_pca ${prefix_pca} --prefix_clust ${prefix_clust} --pca_score_cutoff ${pca_score_cutoff} --rand_seed_consensus ${rand_seed_consensus} --nmetaclusts ${nmetaclusts} --tsne_pmin ${tsne_pmin} --path_fun_formulas ${path_fun_formulas} --outdir_fun_formulas ${outdir_fun_formulas}
+
+./Analysis_block_1_main.sh --RCODE ${RCODE} --RWD_MAIN ${RWD_MAIN} --data_dir ${data_dir} --prepare_metadata false --data_normalization ${data_normalization} --pcascores ${pcascores} --select_observables ${select_observables} --flowsom ${flowsom} --flowsom_validation ${flowsom_validation} --heatmaps ${heatmaps} --runtsne ${runtsne} --plottsne ${plottsne} --plottsne_expr false --frequencies ${frequencies} --expression false --METADATA ${METADATA} --path_fun_prepare_metadata ${path_fun_prepare_metadata} --PANELS ${PANELS} --file_metadata ${file_metadata} --file_panel ${file_panel} --prefix_data ${prefix_data} --prefix_panel ${prefix_panel} --prefix_pca ${prefix_pca} --prefix_clust ${prefix_clust} --pca_score_cutoff ${pca_score_cutoff} --rand_seed_consensus ${rand_seed_consensus} --nmetaclusts ${nmetaclusts} --tsne_pmin ${tsne_pmin} --path_fun_formulas ${path_fun_formulas} --outdir_fun_formulas ${outdir_fun_formulas}
+
+
+for i in 10
+do
+  nmetaclusts=$i
+  prefix_clust="cl${i}_"
+
+  ./Analysis_block_1_main.sh --RCODE ${RCODE} --RWD_MAIN ${RWD_MAIN} --data_dir ${data_dir} --prepare_metadata false --data_normalization false --pcascores false --select_observables false --flowsom ${flowsom} --flowsom_validation false --heatmaps ${heatmaps} --runtsne false --plottsne ${plottsne} --plottsne_expr false --frequencies ${frequencies} --expression false --METADATA ${METADATA} --path_fun_prepare_metadata ${path_fun_prepare_metadata} --PANELS ${PANELS} --file_metadata ${file_metadata} --file_panel ${file_panel} --prefix_data ${prefix_data} --prefix_panel ${prefix_panel} --prefix_pca ${prefix_pca} --prefix_clust ${prefix_clust} --pca_score_cutoff ${pca_score_cutoff} --rand_seed_consensus ${rand_seed_consensus} --nmetaclusts ${nmetaclusts} --tsne_pmin ${tsne_pmin} --path_fun_formulas ${path_fun_formulas} --outdir_fun_formulas ${outdir_fun_formulas}
+
+done
+
+
+# --------------------------------------------------
+# Analysis of MyeEUNITERfinal_neutrophils_merging_noPatient1
+# Use Analysis block 1
+# --------------------------------------------------
+
+### Copy the fcs from MyeEUNITERfinal_neutrophils_merging/010_cleanfcs/ into MyeEUNITERfinal_neutrophils_merging_noPatient1/010_cleanfcs/
+
+# mkdir -p $RWD_MAIN/MyeEUNITERfinal_neutrophils_merging_noPatient1/010_cleanfcs
+# cp $RWD_MAIN/MyeEUNITERfinal_neutrophils_merging/010_cleanfcs/*.fcs $RWD_MAIN/MyeEUNITERfinal_neutrophils_merging_noPatient1/010_cleanfcs/
+
+# -------------------------
+
+file_metadata="metadata_MyeEUNITERfinal_noPatient1"
+
+rand_seed_consensus=1234
+nmetaclusts=20
+
+prefix_pca="pca0_"
+prefix_clust="cl20_"
+
+data_dir='MyeEUNITERfinal_neutrophils_merging_noPatient1'
+prefix_data='myefNEUTROPnoP1_'
+file_panel='panel_MyeEUNITERfinal.xlsx'
+prefix_panel='myef_'
+pca_score_cutoff=0
+
+
+./Analysis_block_1_main.sh --RCODE ${RCODE} --RWD_MAIN ${RWD_MAIN} --data_dir ${data_dir} --prepare_metadata ${prepare_metadata} --data_normalization ${data_normalization} --pcascores ${pcascores} --select_observables ${select_observables} --flowsom ${flowsom} --flowsom_validation ${flowsom_validation} --heatmaps ${heatmaps} --runtsne ${runtsne} --plottsne ${plottsne} --plottsne_expr false --frequencies ${frequencies} --expression false --METADATA ${METADATA} --path_fun_prepare_metadata ${path_fun_prepare_metadata} --PANELS ${PANELS} --file_metadata ${file_metadata} --file_panel ${file_panel} --prefix_data ${prefix_data} --prefix_panel ${prefix_panel} --prefix_pca ${prefix_pca} --prefix_clust ${prefix_clust} --pca_score_cutoff ${pca_score_cutoff} --rand_seed_consensus ${rand_seed_consensus} --nmetaclusts ${nmetaclusts} --tsne_pmin ${tsne_pmin} --path_fun_formulas ${path_fun_formulas} --outdir_fun_formulas ${outdir_fun_formulas}
+
+
+for i in 7 8 12
+do
+  nmetaclusts=$i
+  prefix_clust="cl${i}_"
+
+  ./Analysis_block_1_main.sh --RCODE ${RCODE} --RWD_MAIN ${RWD_MAIN} --data_dir ${data_dir} --prepare_metadata false --data_normalization false --pcascores false --select_observables false --flowsom ${flowsom} --flowsom_validation false --heatmaps ${heatmaps} --runtsne false --plottsne ${plottsne} --plottsne_expr false --frequencies ${frequencies} --expression false --METADATA ${METADATA} --path_fun_prepare_metadata ${path_fun_prepare_metadata} --PANELS ${PANELS} --file_metadata ${file_metadata} --file_panel ${file_panel} --prefix_data ${prefix_data} --prefix_panel ${prefix_panel} --prefix_pca ${prefix_pca} --prefix_clust ${prefix_clust} --pca_score_cutoff ${pca_score_cutoff} --rand_seed_consensus ${rand_seed_consensus} --nmetaclusts ${nmetaclusts} --tsne_pmin ${tsne_pmin} --path_fun_formulas ${path_fun_formulas} --outdir_fun_formulas ${outdir_fun_formulas}
+
+done
+
+
+# --------------------------------------------------
+# Analysis of MyeEUNITERfinal_neutrophils_merging_noPatient1 cluster_merging
+# Use Analysis block 2
+# --------------------------------------------------
+
+prefix_clust="cl12_"
+
+file_merging="010_helpfiles/${prefix_data}${prefix_panel}${prefix_pca}${prefix_clust}cluster_merging.xlsx"
+prefix_merging="merging_"
+
+./Analysis_block_2_cluster_merging.sh --RCODE ${RCODE} --RWD_MAIN ${RWD_MAIN} --data_dir ${data_dir} --cluster_merging ${cluster_merging} --heatmaps ${heatmaps} --plottsne ${plottsne} --frequencies ${frequencies} --expression false --METADATA ${METADATA} --PANELS ${PANELS} --file_metadata ${file_metadata} --file_panel ${file_panel} --prefix_data ${prefix_data} --prefix_panel ${prefix_panel} --prefix_pca ${prefix_pca} --prefix_clust ${prefix_clust} --prefix_merging ${prefix_merging} --file_merging ${file_merging} --path_fun_formulas ${path_fun_formulas} --outdir_fun_formulas ${outdir_fun_formulas}
+
+
+
+
+
+
+
+
+
+
+
 
 
 

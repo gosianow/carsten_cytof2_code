@@ -6,8 +6,8 @@ source ~/.bash_aliases
 ###############################################################################################################
 ## Define paths to software and reference files
 
-RWD_MAIN=/home/Shared/data/cytof/carsten_cytof
-RCODE=/home/gosia/R/carsten_cytof_code
+RWD_MAIN=/home/Shared/data/cytof/carsten_cytof2
+RCODE=/home/gosia/R/carsten_cytof2_code
 METADATA=$RWD_MAIN/Espen_metadata
 PANELS=$RWD_MAIN/Espen_panels
 
@@ -28,8 +28,8 @@ cluster_merging=false
 tsne_pmin="Inf" # In the CK analysis, I use 1500 per sample.
 
 path_fun_prepare_metadata="0espen_prepare_metadata.R"
-path_fun_formulas="00_formulas_1dataset_3responses.R"
-outdir_fun_formulas="3responses"
+path_fun_formulas="00_formulas_espen.R"
+outdir_fun_formulas="/"
 
 ###############################################################################################################
 # Analysis of Espen data

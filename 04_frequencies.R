@@ -25,15 +25,16 @@ library(gtools) # for logit
 # Test arguments
 ##############################################################################
 
-rwd='/home/Shared/data/cytof/carsten_cytof/CK_2016-06-23_01'
-freq_prefix='23_01_pca1_mergingNEW2_'
-freq_outdir='050_frequencies/3responses'
-path_metadata='/home/Shared/data/cytof/carsten_cytof/CK_metadata/metadata_23_01.rds'
-path_clustering='030_heatmaps/23_01_pca1_mergingNEW2_clustering.xls'
-path_clustering_labels='030_heatmaps/23_01_pca1_mergingNEW2_clustering_labels.xls'
-path_fun_models='/home/gosia/R/carsten_cytof_code/00_models.R'
-path_fun_formulas='/home/gosia/R/carsten_cytof_code/00_formulas_1dataset_3responses.R'
-path_fun_plot_heatmaps <- "/home/gosia/R/carsten_cytof_code/00_plot_heatmaps_for_sign_freqs.R"
+rwd='/home/Shared/data/cytof/carsten_cytof2/MyeEUNITERfinal_neutrophils_merging'
+freq_prefix='myefNEUTROP_myef_pca0_cl10_'
+freq_outdir='050_frequencies_auto//'
+path_metadata='/home/Shared/data/cytof/carsten_cytof2/MyeEUNITERfinal_metadata/metadata_MyeEUNITERfinal.rds'
+path_clustering='030_heatmaps/myefNEUTROP_myef_pca0_cl10_clustering.xls'
+path_clustering_labels='030_heatmaps/myefNEUTROP_myef_pca0_cl10_clustering_labels.xls'
+path_fun_models='/home/gosia/R/carsten_cytof2_code/00_models.R'
+path_fun_formulas='/home/gosia/R/carsten_cytof2_code/00_formulas_myef.R'
+path_fun_plot_heatmaps='/home/gosia/R/carsten_cytof2_code/00_plot_heatmaps_for_sign_freqs.R'
+path_fun_plot_frequencies='/home/gosia/R/carsten_cytof2_code/00_plot_frequencies.R'
 
 ### Optional arguments
 pdf_hight=4
@@ -166,6 +167,8 @@ md$patient_id <- factor(md$patient_id)
 ### Plot frequencies
 # ------------------------------------------------------------
 
+source(path_fun_plot_frequencies)
+
 ggdf <- melt(prop_out, id.vars = c("cluster", "label"), value.name = "prop", variable.name = "samp")
 
 ## use labels as clusters
@@ -178,33 +181,7 @@ ggdf$group <- factor(md$condition[mm])
 ggdf$condition2 <- factor(md$condition2[mm])
 
 
-# ------------------------------------
-# plot all clusters in one pdf; colors per group; boxplots + points
-
-
-ggp <- ggplot(ggdf, aes(x = cluster, y = prop, color = group, fill = group)) +
-  geom_boxplot(outlier.colour = NA) +
-  geom_point(size = 2, shape = 16, alpha = 0.8, position = position_jitterdodge(jitter.width = 1, jitter.height = 0, dodge.width = 1)) +
-  theme_bw() +
-  ylab("Frequency") +
-  xlab("") +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size=12, face="bold"), 
-    axis.title.y = element_text(size=12, face="bold"), 
-    panel.grid.major = element_blank(), 
-    panel.grid.minor = element_blank(), 
-    panel.border = element_blank(), 
-    axis.line.x = element_line(size = 0.5, linetype = "solid", color = "black"), 
-    axis.line.y = element_line(size = 0.5, linetype = "solid", color = "black"),
-    legend.title = element_blank(), legend.position = "right", legend.key = element_blank()) +
-  guides(color = guide_legend(ncol = 1)) +
-  scale_color_manual(values = color_groups) +
-  scale_fill_manual(values = color_groupsb) +
-  facet_wrap(~ condition2)
-
-pdf(file.path(outdir, paste0(prefix, "frequencies_plot.pdf")), w = nlevels(ggdf$cluster) + 2, h = pdf_hight)
-print(ggp)
-dev.off()
-
+plot_frequencies(ggdf = ggdf, color_groups = color_groups, color_groupsb = color_groupsb, outdir = outdir, prefix = prefix, pdf_hight = pdf_hight)
 
 
 
@@ -218,6 +195,7 @@ dev.off()
 
 ### Load functions fitting models
 source(path_fun_models)
+
 ### Load formulas that are fit in the models - this function may change the md object!!!
 source(path_fun_formulas)
 
