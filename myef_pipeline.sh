@@ -53,7 +53,7 @@ prefix_panel="myef_"
 prefix_pca="pca0_"
 prefix_clust="cl20_"
 
-./Analysis_block_1_main.sh --RCODE ${RCODE} --RWD_MAIN ${RWD_MAIN} --data_dir ${data_dir} --prepare_metadata ${prepare_metadata} --data_normalization ${data_normalization} --pcascores ${pcascores} --select_observables ${select_observables} --flowsom ${flowsom} --flowsom_validation false --heatmaps ${heatmaps} --runtsne ${runtsne} --plottsne ${plottsne} --plottsne_expr ${plottsne_expr} --frequencies false --expression false --METADATA ${METADATA} --path_fun_prepare_metadata ${path_fun_prepare_metadata} --PANELS ${PANELS} --file_metadata ${file_metadata} --file_panel ${file_panel} --prefix_data ${prefix_data} --prefix_panel ${prefix_panel} --prefix_pca ${prefix_pca} --prefix_clust ${prefix_clust} --pca_score_cutoff ${pca_score_cutoff} --rand_seed_consensus ${rand_seed_consensus} --nmetaclusts ${nmetaclusts} --tsne_pmin ${tsne_pmin} --path_fun_formulas ${path_fun_formulas} --outdir_fun_formulas ${outdir_fun_formulas}
+./Analysis_block_1_main.sh --RCODE ${RCODE} --RWD_MAIN ${RWD_MAIN} --data_dir ${data_dir} --prepare_metadata ${prepare_metadata} --data_normalization ${data_normalization} --pcascores ${pcascores} --select_observables ${select_observables} --flowsom ${flowsom} --flowsom_validation false --heatmaps ${heatmaps} --runtsne ${runtsne} --plottsne ${plottsne} --plottsne_expr ${plottsne_expr} --frequencies ${frequencies} --expression false --METADATA ${METADATA} --path_fun_prepare_metadata ${path_fun_prepare_metadata} --PANELS ${PANELS} --file_metadata ${file_metadata} --file_panel ${file_panel} --prefix_data ${prefix_data} --prefix_panel ${prefix_panel} --prefix_pca ${prefix_pca} --prefix_clust ${prefix_clust} --pca_score_cutoff ${pca_score_cutoff} --rand_seed_consensus ${rand_seed_consensus} --nmetaclusts ${nmetaclusts} --tsne_pmin ${tsne_pmin} --path_fun_formulas ${path_fun_formulas} --outdir_fun_formulas ${outdir_fun_formulas}
 
 
 for i in 11
@@ -61,7 +61,7 @@ do
   nmetaclusts=$i
   prefix_clust="cl${i}_"
 
-  ./Analysis_block_1_main.sh --RCODE ${RCODE} --RWD_MAIN ${RWD_MAIN} --data_dir ${data_dir} --prepare_metadata false --data_normalization false --pcascores false --select_observables false --flowsom ${flowsom} --flowsom_validation false --heatmaps ${heatmaps} --runtsne false --plottsne ${plottsne} --plottsne_expr false --frequencies false --expression false --METADATA ${METADATA} --path_fun_prepare_metadata ${path_fun_prepare_metadata} --PANELS ${PANELS} --file_metadata ${file_metadata} --file_panel ${file_panel} --prefix_data ${prefix_data} --prefix_panel ${prefix_panel} --prefix_pca ${prefix_pca} --prefix_clust ${prefix_clust} --pca_score_cutoff ${pca_score_cutoff} --rand_seed_consensus ${rand_seed_consensus} --nmetaclusts ${nmetaclusts} --tsne_pmin ${tsne_pmin} --path_fun_formulas ${path_fun_formulas} --outdir_fun_formulas ${outdir_fun_formulas}
+  ./Analysis_block_1_main.sh --RCODE ${RCODE} --RWD_MAIN ${RWD_MAIN} --data_dir ${data_dir} --prepare_metadata false --data_normalization false --pcascores false --select_observables false --flowsom ${flowsom} --flowsom_validation false --heatmaps ${heatmaps} --runtsne false --plottsne ${plottsne} --plottsne_expr false --frequencies ${frequencies} --expression false --METADATA ${METADATA} --path_fun_prepare_metadata ${path_fun_prepare_metadata} --PANELS ${PANELS} --file_metadata ${file_metadata} --file_panel ${file_panel} --prefix_data ${prefix_data} --prefix_panel ${prefix_panel} --prefix_pca ${prefix_pca} --prefix_clust ${prefix_clust} --pca_score_cutoff ${pca_score_cutoff} --rand_seed_consensus ${rand_seed_consensus} --nmetaclusts ${nmetaclusts} --tsne_pmin ${tsne_pmin} --path_fun_formulas ${path_fun_formulas} --outdir_fun_formulas ${outdir_fun_formulas}
 
 done
 
@@ -76,7 +76,7 @@ prefix_clust="cl20_"
 file_merging="010_helpfiles/${prefix_data}${prefix_panel}${prefix_pca}${prefix_clust}cluster_merging.xlsx"
 prefix_merging="merging_"
 
-./Analysis_block_2_cluster_merging.sh --RCODE ${RCODE} --RWD_MAIN ${RWD_MAIN} --data_dir ${data_dir} --cluster_merging ${cluster_merging} --heatmaps ${heatmaps} --plottsne ${plottsne} --frequencies ${frequencies} --expression ${expression} --METADATA ${METADATA} --PANELS ${PANELS} --file_metadata ${file_metadata} --file_panel ${file_panel} --prefix_data ${prefix_data} --prefix_panel ${prefix_panel} --prefix_pca ${prefix_pca} --prefix_clust ${prefix_clust} --prefix_merging ${prefix_merging} --file_merging ${file_merging} --path_fun_formulas ${path_fun_formulas} --outdir_fun_formulas ${outdir_fun_formulas}
+./Analysis_block_2_cluster_merging.sh --RCODE ${RCODE} --RWD_MAIN ${RWD_MAIN} --data_dir ${data_dir} --cluster_merging ${cluster_merging} --heatmaps ${heatmaps} --plottsne ${plottsne} --frequencies ${frequencies} --expression false --METADATA ${METADATA} --PANELS ${PANELS} --file_metadata ${file_metadata} --file_panel ${file_panel} --prefix_data ${prefix_data} --prefix_panel ${prefix_panel} --prefix_pca ${prefix_pca} --prefix_clust ${prefix_clust} --prefix_merging ${prefix_merging} --file_merging ${file_merging} --path_fun_formulas ${path_fun_formulas} --outdir_fun_formulas ${outdir_fun_formulas}
 
 
 # --------------------------------------------------
@@ -136,8 +136,8 @@ done
 
 ### Copy the fcs from MyeEUNITERfinal_neutrophils_merging/010_cleanfcs/ into MyeEUNITERfinal_neutrophils_merging_noPatient1/010_cleanfcs/
 
-# mkdir -p $RWD_MAIN/MyeEUNITERfinal_neutrophils_merging_noPatient1/010_cleanfcs
-# cp $RWD_MAIN/MyeEUNITERfinal_neutrophils_merging/010_cleanfcs/*.fcs $RWD_MAIN/MyeEUNITERfinal_neutrophils_merging_noPatient1/010_cleanfcs/
+mkdir -p $RWD_MAIN/MyeEUNITERfinal_neutrophils_merging_noPatient1/010_cleanfcs
+cp $RWD_MAIN/MyeEUNITERfinal_neutrophils_merging/010_cleanfcs/*.fcs $RWD_MAIN/MyeEUNITERfinal_neutrophils_merging_noPatient1/010_cleanfcs/
 
 # -------------------------
 
