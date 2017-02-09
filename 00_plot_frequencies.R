@@ -35,6 +35,43 @@ plot_frequencies <- function(ggdf, color_groups, color_groupsb, outdir, prefix, 
     
     
     # ------------------------------------
+    ### Facet per cluster
+    
+    nr_cluster <- nlevels(ggdf$cluster)
+    nrow <- ifelse(nr_cluster < 6, 1, 2)
+    h <- ifelse(nr_cluster < 6, 2, 4)
+    w <- ifelse(nr_cluster < 6, nr_cluster * 1.5 + 2, ceiling(nr_cluster/2) * 2 + 2)
+
+
+      ggp <- ggplot(ggdf, aes(x = group, y = prop, color = group, fill = group)) +
+        geom_boxplot(width = 0.95, position = position_dodge(width = 0.95), outlier.colour = NA) +
+        geom_point(size = 2, alpha = 0.8, position = position_jitterdodge(jitter.width = 0.95, jitter.height = 0, dodge.width = 0.95)) +
+        theme_bw() +
+        ylab("Frequency") +
+        xlab("") +
+        theme(axis.text.x = element_blank(), 
+          axis.ticks.x = element_blank(),
+          axis.title.y = element_text(size=12, face="bold"), 
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(), 
+          panel.border = element_blank(), 
+          axis.line.x = element_line(size = 0.5, linetype = "solid", color = "black"), 
+          axis.line.y = element_line(size = 0.5, linetype = "solid", color = "black"),
+          legend.title = element_blank(), legend.position = "right", legend.key = element_blank(),
+          strip.background = element_blank(), strip.text = element_text(size=9, hjust = 0)) +
+        guides(color = guide_legend(ncol = 1)) +
+        scale_color_manual(values = color_groups) +
+        scale_fill_manual(values = color_groupsb) +
+        facet_wrap(~ cluster, scales = "free", nrow = nrow)
+      
+    
+    pdf(file.path(outdir, paste0(prefix, "frequencies_plot2.pdf")), w = w, h = h)
+      print(ggp)
+    dev.off()
+    
+    
+    
+    # ------------------------------------
     ### plot each cluster as a separate page in the pdf file
     ggp <- list()
     clusters <- levels(ggdf$cluster)
@@ -65,7 +102,7 @@ plot_frequencies <- function(ggdf, color_groups, color_groupsb, outdir, prefix, 
       
     }
     
-    pdf(file.path(outdir, paste0(prefix, "frequencies_plot2.pdf")), w=5, h=4, onefile=TRUE)
+    pdf(file.path(outdir, paste0(prefix, "frequencies_plot3.pdf")), w=5, h=4, onefile=TRUE)
     for(i in seq(length(ggp)))
       print(ggp[[i]])
     dev.off()
@@ -107,7 +144,8 @@ plot_frequencies <- function(ggdf, color_groups, color_groupsb, outdir, prefix, 
     
     
     # ------------------------------------
-    # plot all clusters in one pdf; colors per response; separate pdf for base and tx; one boxplot + points + facet per cluster
+    # plot all clusters in one pdf; colors per response; separate pdf for base and tx; 
+    # one boxplot + points + facet per cluster
     
     condition2s <- levels(ggdf$condition2)
     
@@ -148,7 +186,8 @@ plot_frequencies <- function(ggdf, color_groups, color_groupsb, outdir, prefix, 
     }
     
     # ------------------------------------
-    # plot all clusters in one pdf; colors per response; separate pdf for base and tx; one boxplot + points + pdf page per cluster
+    # plot all clusters in one pdf; colors per response; separate pdf for base and tx; 
+    # one boxplot + points + pdf page per cluster
     
     condition2s <- levels(ggdf$condition2)
     clusters <- levels(ggdf$cluster)
@@ -192,6 +231,48 @@ plot_frequencies <- function(ggdf, color_groups, color_groupsb, outdir, prefix, 
     }
     
     
+    # -----------------------------------------------------------------------
+    # Plot all the pairwise combinations of groups
+    
+    combs <- combn(levels(ggdf$group), 2)
+    
+    nr_cluster <- nlevels(ggdf$cluster)
+    nrow <- ifelse(nr_cluster < 6, 1, 2)
+    h <- ifelse(nr_cluster < 6, 2, 4)
+    w <- ifelse(nr_cluster < 6, nr_cluster * 1.25 + 2, ceiling(nr_cluster/2) * 1.5 + 2)
+    
+    for(i in 1:ncol(combs)){
+      # i = 1
+      
+      df <- ggdf[ggdf$group %in% combs[, i], , drop = FALSE]
+      
+      ggp <- ggplot(df) +
+        geom_boxplot(aes(x = cluster, y = prop, color = group, fill = group), width = 0.95, position = position_dodge(width = 0.95), outlier.colour = NA) +
+        geom_point(aes(x = cluster, y = prop, color = group), size=2, alpha = 0.8, position = position_jitterdodge(jitter.width = 0.95, jitter.height = 0, dodge.width = 0.95)) +
+        theme_bw() +
+        ylab("Frequency") +
+        xlab("") +
+        theme(axis.text.x = element_blank(), 
+          axis.ticks.x = element_blank(),
+          axis.title.y = element_text(size=12, face="bold"), 
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(), 
+          panel.border = element_blank(), 
+          axis.line.x = element_line(size = 0.5, linetype = "solid", color = "black"), 
+          axis.line.y = element_line(size = 0.5, linetype = "solid", color = "black"),
+          legend.title = element_blank(), legend.position = "right", legend.key = element_blank(),
+          strip.background = element_blank(), strip.text = element_text(size=9, hjust = 0)) +
+        scale_color_manual(values = color_groups) +
+        scale_fill_manual(values = color_groupsb) +
+        facet_wrap(~ cluster, scales = "free", nrow = nrow)
+      
+      pdf(file.path(outdir, paste0(prefix, "frequencies_plot_boxplotpoints_", paste0(combs[, i], collapse = "_"),"2.pdf")), w = w, h = h)
+      print(ggp)
+      dev.off()
+      
+    }
+    
+
   }else{
     
     pdf(file.path(outdir, paste0(prefix, "frequencies_plot.pdf")))
@@ -199,6 +280,10 @@ plot_frequencies <- function(ggdf, color_groups, color_groupsb, outdir, prefix, 
     dev.off()
     
     pdf(file.path(outdir, paste0(prefix, "frequencies_plot2.pdf")))
+    plot(1, type="n", axes=F, xlab="", ylab="")
+    dev.off()
+    
+    pdf(file.path(outdir, paste0(prefix, "frequencies_plot3.pdf")))
     plot(1, type="n", axes=F, xlab="", ylab="")
     dev.off()
     
@@ -220,6 +305,12 @@ plot_frequencies <- function(ggdf, color_groups, color_groupsb, outdir, prefix, 
       dev.off()
     }
     
+    for(i in 1:ncol(combs)){
+      pdf(file.path(outdir, paste0(prefix, "frequencies_plot_boxplotpoints_", paste0(combs[, i], collapse = "_"),"2.pdf")))
+      plot(1, type="n", axes=F, xlab="", ylab="")
+      dev.off()
+    }
+
   }
   
   

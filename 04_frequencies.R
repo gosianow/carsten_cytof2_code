@@ -36,6 +36,18 @@ path_fun_formulas='/home/gosia/R/carsten_cytof2_code/00_formulas_myef.R'
 path_fun_plot_heatmaps='/home/gosia/R/carsten_cytof2_code/00_plot_heatmaps_for_sign_freqs.R'
 path_fun_plot_frequencies='/home/gosia/R/carsten_cytof2_code/00_plot_frequencies.R'
 
+rwd='/home/Shared/data/cytof/carsten_cytof2/MyeEUNITERfinal_neutrophils_merging_noPatient1'
+freq_prefix='myefNEUTROPnoP1_myef_pca0_merging_'
+freq_outdir='050_frequencies//'
+path_metadata='/home/Shared/data/cytof/carsten_cytof2/MyeEUNITERfinal_metadata/metadata_MyeEUNITERfinal_noPatient1.rds'
+path_clustering='030_heatmaps/myefNEUTROPnoP1_myef_pca0_merging_clustering.xls'
+path_clustering_labels='030_heatmaps/myefNEUTROPnoP1_myef_pca0_merging_clustering_labels.xls'
+path_fun_models='/home/gosia/R/carsten_cytof2_code/00_models.R'
+path_fun_formulas='/home/gosia/R/carsten_cytof2_code/00_formulas_myef.R'
+path_fun_plot_heatmaps='/home/gosia/R/carsten_cytof2_code/00_plot_heatmaps_for_sign_freqs.R'
+path_fun_plot_frequencies='/home/gosia/R/carsten_cytof2_code/00_plot_frequencies.R'
+
+
 ### Optional arguments
 pdf_hight=4
 
@@ -112,6 +124,8 @@ if("drop" %in% labels$label){
   
 }
 
+labels
+
 clust <- clustering[, "cluster"]
 
 # ---------------------------------------
@@ -162,6 +176,7 @@ md$condition1 <- factor(md$condition1)
 md$condition2 <- factor(md$condition2)
 md$patient_id <- factor(md$patient_id)
 
+md
 
 # ------------------------------------------------------------
 ### Plot frequencies

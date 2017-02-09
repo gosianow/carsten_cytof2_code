@@ -27,6 +27,23 @@ library(ConsensusClusterPlus)
 # Test arguments
 ##############################################################################
 
+rwd='/home/Shared/data/cytof/carsten_cytof2/MyeEUNITERfinal_neutrophils_merging_noPatient1'
+heatmap_prefix='myefNEUTROPnoP1_myef_pca0_merging_raw_'
+heatmap_outdir='030_heatmaps'
+path_data='010_data/myefNEUTROPnoP1_myef_expr_raw.rds'
+path_clustering_observables='030_heatmaps/myefNEUTROPnoP1_myef_pca0_clustering_observables.xls'
+path_clustering='030_heatmaps/myefNEUTROPnoP1_myef_pca0_merging_clustering.xls'
+path_clustering_labels='030_heatmaps/myefNEUTROPnoP1_myef_pca0_merging_clustering_labels.xls'
+path_marker_selection='010_helpfiles/myefNEUTROPnoP1_myef_pca0_merging_marker_selection.txt'
+aggregate_fun='median'
+pheatmap_palette='YlGnBu'
+pheatmap_palette_rev=FALSE
+pheatmap_scale=TRUE
+extra_path_data='010_data/myefNEUTROPnoP1_myef_expr_norm.rds'
+extra_pheatmap_palette='Greys'
+extra_pheatmap_palette_rev=FALSE
+extra_suffix='_norm'
+
 rwd='/Users/gosia/Dropbox/UZH/carsten_cytof/CK_2016-06-23_01'
 heatmap_prefix='23_01_pca1_cl20_raw_'
 heatmap_outdir='030_heatmaps'
@@ -39,7 +56,6 @@ aggregate_fun='median'
 pheatmap_palette='YlGnBu' # RdYlBu
 pheatmap_palette_rev=FALSE
 pheatmap_scale=TRUE
-
 
 ### Optional args
 extra_path_data='010_data/23_01_expr_norm.rds'
@@ -85,9 +101,7 @@ if(all(!grepl("linkage=", args))){
 
 
 if(any(grepl("merging_suffix=", args))){
-  
   suffix <- merging_suffix
-  
 }
 
 
@@ -112,17 +126,24 @@ e <- expr[, fcs_colnames]
 # Load clustering data
 # ------------------------------------------------------------
 
-# clustering
-clustering <- read.table(path_clustering, header = TRUE, sep = "\t", as.is = TRUE)
-
-clust <- clustering[, "cluster"]
-names(clust) <- clustering[, "cell_id"]
 
 # clustering labels
 labels <- read.table(path_clustering_labels, header = TRUE, sep = "\t", as.is = TRUE)
 labels <- labels[order(labels$cluster, decreasing = FALSE), ]
 labels$label <- factor(labels$label, levels = unique(labels$label))
 rownames(labels) <- labels$cluster
+
+# clustering
+clustering <- read.table(path_clustering, header = TRUE, sep = "\t", as.is = TRUE)
+
+### Skipp 'drop' cluster
+clustering <- clustering[clustering$cluster %in% labels$cluster[labels$label != "drop"], , drop = FALSE]
+
+clust <- clustering[, "cluster"]
+names(clust) <- clustering[, "cell_id"]
+
+labels <- labels[labels$label != "drop", , drop = FALSE]
+labels$label <- factor(labels$label)
 
 # clustering observables
 clustering_observables <- read.table(path_clustering_observables, header = TRUE, sep = "\t", as.is = TRUE)
@@ -145,6 +166,10 @@ if(any(grepl("path_cluster_merging=", args))){
   
   # read cluster merging file
   cm <- read.xls(path_cluster_merging)
+  
+  ### Skipp 'drop' cluster
+  cm <- cm[cm$label != "drop", , drop = FALSE]
+  cm$label <- factor(cm$label)
   
   if(!all(c("old_cluster", "label", "new_cluster") %in% colnames(cm)))
     stop("Merging file must contain 'old_cluster', 'label' and 'new_cluster' columns!")
@@ -205,6 +230,7 @@ if(file.exists(file.path(path_marker_selection))){
   
 }
 
+marker_selection
 
 # ------------------------------------------------------------
 # get the isotope and antigen for fcs markers
@@ -333,7 +359,7 @@ if(pheatmap_scale){
   )
   
   
-  color <- colorRampPalette(brewer.pal(n = 8, name = "Greys"))(120)[11:110]
+  color <- colorRampPalette(brewer.pal(n = 8, name = "Greys"))(120)[c(21:120)]
   
   ## With row clustering
   pheatmap(expr_scaled, color = color, cellwidth = 24, cellheight = 24, cluster_cols = FALSE, cluster_rows = cluster_rows, labels_col = labels_col, labels_row = labels_row, breaks = breaks, legend_breaks = legend_breaks, display_numbers = TRUE, number_color = "black", fontsize_number = 8, gaps_col = length(scols), fontsize_row = 14, fontsize_col = 14, fontsize = 12, annotation_row = annotation_row, annotation_colors = annotation_colors, filename = file.path(outdir, paste0(prefix, "pheatmap_all_row_clust_scale", suffix, ".pdf")))
@@ -411,14 +437,20 @@ if(any(grepl("extra_path_data=", args))){
   labels_col <- colnames(expr)
   
   if(extra_pheatmap_palette_rev){
-    color <- colorRampPalette(rev(brewer.pal(n = 8, name = extra_pheatmap_palette)))(100)
+    color <- colorRampPalette(rev(brewer.pal(n = 8, name = extra_pheatmap_palette)))(120)[c(1, 22:120)]
   }else{
-    color <- colorRampPalette(brewer.pal(n = 8, name = extra_pheatmap_palette))(100)
+    color <- colorRampPalette(brewer.pal(n = 8, name = extra_pheatmap_palette))(120)[c(1, 22:120)]
   }
   
-  pheatmap(expr, color = color, cellwidth = 24, cellheight = 24, cluster_cols = FALSE, cluster_rows = cluster_rows, labels_col = labels_col, labels_row = labels_row, display_numbers = TRUE, number_color = "black", fontsize_number = 8, gaps_col = length(scols), fontsize_row = 14, fontsize_col = 14, fontsize = 12, annotation_row = annotation_row, annotation_colors = annotation_colors, filename = file.path(outdir, paste0(prefix, "pheatmap_all_row_clust", extra_suffix, suffix, ".pdf")))
+  ### Fixed legend range from 0 to 1 
+  # breaks <- NA
+  # legend_breaks <- NA
+  breaks = seq(from = 0, to = 1, length.out = 101)
+  legend_breaks = seq(from = 0, to = 1, by = 0.2)
   
-  pheatmap(expr[rows_order, ], color = color, cellwidth = 24, cellheight = 24, cluster_cols = FALSE, cluster_rows = FALSE, labels_col = labels_col, labels_row = labels_row[rows_order], display_numbers = TRUE, number_color = "black", fontsize_number = 8, gaps_col = length(scols), fontsize_row = 14, fontsize_col = 14, fontsize = 12, annotation_row = annotation_row, annotation_colors = annotation_colors, filename = file.path(outdir, paste0(prefix, "pheatmap_all", extra_suffix, suffix, ".pdf")))
+  pheatmap(expr, color = color, cellwidth = 24, cellheight = 24, cluster_cols = FALSE, cluster_rows = cluster_rows, labels_col = labels_col, labels_row = labels_row, breaks = breaks, legend_breaks = legend_breaks, display_numbers = TRUE, number_color = "black", fontsize_number = 8, gaps_col = length(scols), fontsize_row = 14, fontsize_col = 14, fontsize = 12, annotation_row = annotation_row, annotation_colors = annotation_colors, filename = file.path(outdir, paste0(prefix, "pheatmap_all_row_clust", extra_suffix, suffix, ".pdf")))
+  
+  pheatmap(expr[rows_order, ], color = color, cellwidth = 24, cellheight = 24, cluster_cols = FALSE, cluster_rows = FALSE, labels_col = labels_col, labels_row = labels_row[rows_order], breaks = breaks, legend_breaks = legend_breaks, display_numbers = TRUE, number_color = "black", fontsize_number = 8, gaps_col = length(scols), fontsize_row = 14, fontsize_col = 14, fontsize = 12, annotation_row = annotation_row, annotation_colors = annotation_colors, filename = file.path(outdir, paste0(prefix, "pheatmap_all", extra_suffix, suffix, ".pdf")))
   
   
   ## Plot only the selected markers
@@ -426,9 +458,9 @@ if(any(grepl("extra_path_data=", args))){
     expr_sub <- expr[, marker_selection, drop = FALSE]
     labels_col_sub <- colnames(expr_sub)
     
-    pheatmap(expr_sub, color = color, cellwidth = 24, cellheight = 24, cluster_cols = FALSE, cluster_rows = cluster_rows, labels_col = labels_col_sub, labels_row = labels_row, fontsize_row = 14, fontsize_col = 14, fontsize = 12, annotation_row = annotation_row, annotation_colors = annotation_colors, filename = file.path(outdir, paste0(prefix, "pheatmap_s1_row_clust", extra_suffix, suffix, ".pdf")))
+    pheatmap(expr_sub, color = color, cellwidth = 24, cellheight = 24, cluster_cols = FALSE, cluster_rows = cluster_rows, labels_col = labels_col_sub, labels_row = labels_row, breaks = breaks, legend_breaks = legend_breaks, fontsize_row = 14, fontsize_col = 14, fontsize = 12, annotation_row = annotation_row, annotation_colors = annotation_colors, filename = file.path(outdir, paste0(prefix, "pheatmap_s1_row_clust", extra_suffix, suffix, ".pdf")))
     
-    pheatmap(expr_sub[rows_order, ], color = color, cellwidth = 24, cellheight = 24, cluster_cols = FALSE, cluster_rows = FALSE, labels_col = labels_col_sub, labels_row = labels_row[rows_order], fontsize_row = 14, fontsize_col = 14, fontsize = 12, annotation_row = annotation_row, annotation_colors = annotation_colors, filename = file.path(outdir, paste0(prefix, "pheatmap_s1", extra_suffix, suffix, ".pdf")))
+    pheatmap(expr_sub[rows_order, ], color = color, cellwidth = 24, cellheight = 24, cluster_cols = FALSE, cluster_rows = FALSE, labels_col = labels_col_sub, labels_row = labels_row[rows_order], breaks = breaks, legend_breaks = legend_breaks, fontsize_row = 14, fontsize_col = 14, fontsize = 12, annotation_row = annotation_row, annotation_colors = annotation_colors, filename = file.path(outdir, paste0(prefix, "pheatmap_s1", extra_suffix, suffix, ".pdf")))
     
   }
   
